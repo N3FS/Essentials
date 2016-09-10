@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 
 import java.util.Iterator;
+import java.util.logging.Level;
 
 
 public class EssentialsServerListener implements Listener {
