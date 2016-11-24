@@ -770,6 +770,11 @@ public class OfflinePlayer implements Player {
     }
 
     @Override
+    public PotionEffect getPotionEffect(PotionEffectType potionEffectType) {
+        return null;
+    }
+
+    @Override
     public void removePotionEffect(PotionEffectType pet) {
     }
 
@@ -823,6 +828,11 @@ public class OfflinePlayer implements Player {
 
     @Override
     public InventoryView openMerchant(Villager villager, boolean b) {
+        return null;
+    }
+
+    @Override
+    public InventoryView openMerchant(Merchant merchant, boolean b) {
         return null;
     }
 
@@ -881,6 +891,11 @@ public class OfflinePlayer implements Player {
 
     @Override
     public boolean isBlocking() {
+        return false;
+    }
+
+    @Override
+    public boolean isHandRaised() {
         return false;
     }
 
@@ -1048,6 +1063,31 @@ public class OfflinePlayer implements Player {
     }
 
     @Override
+    public int getPortalCooldown() {
+        return 0;
+    }
+
+    @Override
+    public void setPortalCooldown(int i) {
+
+    }
+
+    @Override
+    public Set<String> getScoreboardTags() {
+        return null;
+    }
+
+    @Override
+    public boolean addScoreboardTag(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean removeScoreboardTag(String s) {
+        return false;
+    }
+
+    @Override
     public void setPlayerWeather(WeatherType arg0) {
     }
 
@@ -1114,11 +1154,31 @@ public class OfflinePlayer implements Player {
     }
 
     @Override
+    public void playSound(Location location, Sound sound, SoundCategory soundCategory, float v, float v1) {
+        
+    }
+
+    @Override
+    public void playSound(Location location, String s, SoundCategory soundCategory, float v, float v1) {
+
+    }
+
+    @Override
     public void stopSound(Sound sound) {
     }
 
     @Override
     public void stopSound(String s) {
+    }
+
+    @Override
+    public void stopSound(Sound sound, SoundCategory soundCategory) {
+
+    }
+
+    @Override
+    public void stopSound(String s, SoundCategory soundCategory) {
+
     }
 
     @Override
