@@ -669,6 +669,11 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
         if (user == null) {
             if (getSettings().isDebug()) {
                 LOGGER.log(Level.INFO, "Constructing new userfile from base player {0}", base.getName());
+                StringBuilder builder = new StringBuilder();
+                for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+                    builder.append(element.toString());
+                    builder.append(System.lineSeparator());
+                }
             }
             user = new User(base, this);
         } else {
