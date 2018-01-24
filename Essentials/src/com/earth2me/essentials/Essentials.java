@@ -674,6 +674,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
                     builder.append(element.toString());
                     builder.append(System.lineSeparator());
                 }
+                LOGGER.log(Level.INFO, builder.toString());
             }
             user = new User(base, this);
         } else {
