@@ -416,7 +416,8 @@ public class Settings implements net.ess3.api.ISettings {
     public String getChatFormat(String group) {
         String mFormat = chatFormats.get(group);
         if (mFormat == null) {
-            mFormat = config.getString("chat.group-formats." + (group == null ? "Default" : group), config.getString("chat.format", "&7[{GROUP}]&r {DISPLAYNAME}&7:&r {MESSAGE}"));
+            mFormat = config.getString("chat.group-formats." + (group == null ? "Default" : group),
+                    config.getString("chat.format", "&7[{GROUP}]&r {DISPLAYNAME}&7:&r {MESSAGE}"));
             mFormat = FormatUtil.replaceFormat(mFormat);
             mFormat = mFormat.replace("{DISPLAYNAME}", "%1$s");
             mFormat = mFormat.replace("{MESSAGE}", "%2$s");
@@ -432,6 +433,11 @@ public class Settings implements net.ess3.api.ISettings {
             mFormat = "§r".concat(mFormat);
             chatFormats.put(group, mFormat);
         }
+
+        if (isDebug()) {
+            ess.getLogger().info("Found format for group " + group + ": " + mFormat);
+        }
+
         return mFormat;
     }
 
