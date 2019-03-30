@@ -66,10 +66,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.plugin.InvalidDescriptionException;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -78,6 +75,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -274,12 +272,18 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             for (World w : Bukkit.getWorlds())
                 addDefaultBackPermissionsToWorld(w);
 
+            registerCommandPermissions(this, "essentials.");
+
+            execTimer.mark("RegisterPerms");
+
             metrics = new Metrics(this);
             if (metrics.isEnabled()) {
                 getLogger().info("Starting Metrics. Opt-out using the global bStats config.");
             } else {
                 getLogger().info("Metrics disabled per bStats config.");
             }
+
+            execTimer.mark("StartMetrics");
 
             final String timeroutput = execTimer.end();
             if (getSettings().isDebug()) {
@@ -290,6 +294,26 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
         } catch (Error ex) {
             handleCrash(ex);
             throw ex;
+        }
+    }
+
+    public static void registerCommandPermissions(Plugin plugin, String basePermission) {
+        Collection<Command> commands = null;
+
+        try {
+            SimpleCommandMap scm = (SimpleCommandMap) Server.class.getDeclaredMethod("getCommandMap").invoke(Bukkit.getServer());
+            commands = scm.getCommands();
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            LOGGER.log(Level.WARNING, "Failed to register permissions through command map", e);
+            return;
+        }
+
+        for (Command command : commands) {
+            if (command instanceof PluginCommand && ((PluginCommand) command).getPlugin().getName().equals(plugin.getName())) {
+                PluginCommand pluginCommand = (PluginCommand) command;
+                pluginCommand.setPermission(basePermission + command.getName());
+                pluginCommand.setPermissionMessage("");
+            }
         }
     }
 
