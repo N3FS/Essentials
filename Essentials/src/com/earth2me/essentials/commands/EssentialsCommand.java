@@ -111,7 +111,7 @@ public abstract class EssentialsCommand implements IEssentialsCommand {
             }
         }
 
-        if (exPlayer != null) {
+        if (exPlayer != null && exPlayer.hasPlayedBefore()) {
             user = ess.getUser(exPlayer);
         } else {
             user = ess.getUser(searchTerm);
