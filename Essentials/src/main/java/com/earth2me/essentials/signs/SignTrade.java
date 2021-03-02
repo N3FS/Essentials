@@ -18,6 +18,9 @@ import static com.earth2me.essentials.I18n.tl;
 
 //TODO: TL exceptions
 public class SignTrade extends EssentialsSign {
+
+    private static int MAX_STOCK_LINE_LENGTH = 17;
+
     public SignTrade() {
         super("Trade");
     }
@@ -117,6 +120,7 @@ public class SignTrade extends EssentialsSign {
                 final Map<Integer, ItemStack> withdraw1 = stored1.pay(player, OverflowType.RETURN);
                 final Map<Integer, ItemStack> withdraw2 = stored2.pay(player, OverflowType.RETURN);
 
+                // If both stock and charge were withdrawn successfully, allow the sign to break
                 if (withdraw1 == null && withdraw2 == null) {
                     Trade.log("Sign", "Trade", "Break", signOwner.substring(2), stored2, username, stored1, sign.getBlock().getLocation(), player.getMoney(), ess);
                     return true;
@@ -151,10 +155,9 @@ public class SignTrade extends EssentialsSign {
         if (split.length == 1 && !amountNeeded) {
             final BigDecimal money = getMoney(split[0], ess);
             if (money != null) {
-                if (NumberUtil.shortCurrency(money, ess).length() * 2 > 15) {
-                    throw new SignException("Line can be too long!");
-                }
-                sign.setLine(index, NumberUtil.shortCurrency(money, ess) + ":0");
+                final String newline = NumberUtil.shortCurrency(money, ess) + ":0";
+                validateStockLineLength(line, newline);
+                sign.setLine(index, newline);
                 return;
             }
         }
@@ -182,9 +185,7 @@ public class SignTrade extends EssentialsSign {
                 throw new SignException(tl("moreThanZero"));
             }
             final String newline = amount + " " + split[1] + ":0";
-            if ((newline + amount).length() > 15) {
-                throw new SignException("Line can be too long!");
-            }
+            validateStockLineLength(null, newline);
             sign.setLine(index, newline);
             return;
         }
@@ -321,9 +322,7 @@ public class SignTrade extends EssentialsSign {
             final BigDecimal amount = getBigDecimal(split[1]);
             if (money != null && amount != null) {
                 final String newline = NumberUtil.shortCurrency(money, ess) + ":" + NumberUtil.shortCurrency(value, ess).substring(1);
-                if (newline.length() > 15) {
-                    throw new SignException("This sign is full: Line too long!");
-                }
+                validateStockLineLength(line, newline);
                 sign.setLine(index, newline);
                 return;
             }
@@ -333,23 +332,25 @@ public class SignTrade extends EssentialsSign {
             if (split[1].equalsIgnoreCase("exp") || split[1].equalsIgnoreCase("xp")) {
                 final int stackamount = getIntegerPositive(split[0]);
                 final String newline = stackamount + " " + split[1] + ":" + value.intValueExact();
-                if (newline.length() > 15) {
-                    throw new SignException("This sign is full: Line too long!");
-                }
+                validateStockLineLength(line, newline);
                 sign.setLine(index, newline);
                 return;
             } else {
                 final int stackamount = getIntegerPositive(split[0]);
                 getItemStack(split[1], stackamount, ess);
                 final String newline = stackamount + " " + split[1] + ":" + value.intValueExact();
-                if (newline.length() > 15) {
-                    throw new SignException("This sign is full: Line too long!");
-                }
+                validateStockLineLength(line, newline);
                 sign.setLine(index, newline);
                 return;
             }
         }
         throw new SignException(tl("invalidSignLine", index + 1));
+    }
+
+    private void validateStockLineLength(String oldLine, String newLine) throws SignException {
+        if (newLine.length() > MAX_STOCK_LINE_LENGTH && (oldLine == null || newLine.length() > oldLine.length())) {
+            throw new SignException("This sign is full!");
+        }
     }
 
     public enum AmountType {
