@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static com.earth2me.essentials.I18n.tl;
 
@@ -491,6 +492,9 @@ public class EssentialsSign {
 
         @Override
         public final void setLine(final int index, final String text) {
+            // TODO DEBUG REMOVE
+            Logger.getLogger("Essentials").warning("set INDEX " + index + " to TEXT " + text);
+            // TODO DEBUG REMOVE
             event.setLine(index, text);
             sign.setLine(index, text);
             updateSign();
@@ -531,6 +535,9 @@ public class EssentialsSign {
         @Override
         public final void setLine(final int index, final String text) {
             sign.setLine(index, text);
+            // TODO DEBUG REMOVE
+            Logger.getLogger("Essentials").warning("set INDEX " + index + " to TEXT " + text);
+            // TODO DEBUG REMOVE
         }
 
         @Override
