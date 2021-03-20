@@ -59,7 +59,6 @@ public abstract class UserData extends PlayerExtension implements IConf {
     private long lastLogout;
     private String lastLoginAddress;
     private boolean afk;
-    private boolean newplayer;
     private String geolocation;
     private boolean isSocialSpyEnabled;
     private boolean isNPC;

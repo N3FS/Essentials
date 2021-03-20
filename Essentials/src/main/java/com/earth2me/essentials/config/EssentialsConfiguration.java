@@ -1,5 +1,7 @@
 package com.earth2me.essentials.config;
 
+import com.earth2me.essentials.config.serializers.BigDecimalTypeSerializer;
+import com.earth2me.essentials.config.serializers.LocationTypeSerializer;
 import net.ess3.api.InvalidWorldException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -10,6 +12,7 @@ import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.loader.HeaderMode;
 import org.spongepowered.configurate.loader.ParsingException;
 import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
@@ -38,6 +41,11 @@ import static com.earth2me.essentials.I18n.tl;
 public class EssentialsConfiguration {
     protected static final Logger LOGGER = Logger.getLogger("Essentials");
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+    private static final TypeSerializerCollection SERIALIZERS = TypeSerializerCollection.builder()
+            .register(BigDecimal.class, new BigDecimalTypeSerializer())
+            .register(Location.class, new LocationTypeSerializer())
+            .build();
+
     private final AtomicInteger pendingWrites = new AtomicInteger(0);
     private final AtomicBoolean transaction = new AtomicBoolean(false);
     private Class<?> resourceClass = EssentialsConfiguration.class;
@@ -61,8 +69,15 @@ public class EssentialsConfiguration {
 
     public EssentialsConfiguration(final File configFile, final String templateName, final String header) {
         this.configFile = configFile;
-        this.loader = YamlConfigurationLoader.builder().defaultOptions(ConfigurationOptions.defaults().header(header))
-                .headerMode(HeaderMode.PRESET).nodeStyle(NodeStyle.BLOCK).indent(2).file(configFile).build();
+        this.loader = YamlConfigurationLoader.builder()
+                .defaultOptions(ConfigurationOptions.defaults()
+                        .header(header)
+                        .serializers(SERIALIZERS))
+                .headerMode(HeaderMode.PRESET)
+                .nodeStyle(NodeStyle.BLOCK)
+                .indent(2)
+                .file(configFile)
+                .build();
         this.templateName = templateName;
     }
 
