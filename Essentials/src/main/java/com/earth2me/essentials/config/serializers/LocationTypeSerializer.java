@@ -11,12 +11,17 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 import java.lang.reflect.Type;
 import java.util.UUID;
 
+/**
+ * A Configurate type serializer for {@link Location}s.
+ *
+ * Locations with a null or empty world will be considered invalid.
+ */
 public class LocationTypeSerializer implements TypeSerializer<Location> {
     @Override
     public Location deserialize(Type type, ConfigurationNode node) throws SerializationException {
         final String worldValue = node.node("world").getString();
         if (worldValue == null || worldValue.isEmpty()) {
-            return null;
+            throw new SerializationException("No world value present!");
         }
 
         World world = null;
@@ -32,7 +37,7 @@ public class LocationTypeSerializer implements TypeSerializer<Location> {
         }
 
         if (world == null) {
-            return null;
+            throw new SerializationException("No world value present!");
         }
 
         return new Location(
@@ -47,6 +52,7 @@ public class LocationTypeSerializer implements TypeSerializer<Location> {
     @Override
     public void serialize(Type type, @Nullable Location value, ConfigurationNode node) throws SerializationException {
         if (value == null || value.getWorld() == null) {
+            node.raw(null);
             return;
         }
 

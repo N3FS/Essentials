@@ -1,39 +1,54 @@
 package com.earth2me.essentials.config.serializers;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
+import org.spongepowered.configurate.serialize.ScalarSerializer;
 import org.spongepowered.configurate.serialize.SerializationException;
-import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.function.Predicate;
 
-public class BigDecimalTypeSerializer implements TypeSerializer<BigDecimal> {
-    @Override
-    public BigDecimal deserialize(Type type, ConfigurationNode node) throws SerializationException {
-        final String value = node.getString();
+public class BigDecimalTypeSerializer extends ScalarSerializer<BigDecimal> {
 
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-
-        try {
-            return new BigDecimal(value, MathContext.DECIMAL128);
-        } catch (final NumberFormatException | ArithmeticException e) {
-            throw new SerializationException(e);
-        }
+    BigDecimalTypeSerializer() {
+        super(BigDecimal.class);
     }
 
     @Override
-    public void serialize(Type type, @Nullable BigDecimal value, ConfigurationNode node) throws SerializationException {
-        if (value == null) {
-            node.set(String.class, "0");
-            return;
+    public BigDecimal deserialize(Type type, Object obj) throws SerializationException {
+        if (obj instanceof Double) {
+            return BigDecimal.valueOf((double) obj);
         }
 
-        node.set(String.class, value.toString());
+        if (obj instanceof Integer) {
+            return BigDecimal.valueOf((int) obj);
+        }
+
+        if (obj instanceof Long) {
+            return BigDecimal.valueOf((long) obj);
+        }
+
+        if (obj instanceof BigInteger) {
+            return new BigDecimal((BigInteger) obj);
+        }
+
+        if (obj instanceof String) {
+            try {
+                return new BigDecimal((String) obj, MathContext.DECIMAL128);
+            } catch (final NumberFormatException | ArithmeticException e) {
+                throw new SerializationException(type, "Failed to coerce input value of type " + obj.getClass() + " to BigDecimal", e);
+            }
+        }
+
+        throw new SerializationException(type, "Failed to coerce input value of type " + obj.getClass() + " to BigDecimal");
+    }
+
+    @Override
+    protected Object serialize(BigDecimal item, Predicate<Class<?>> typeSupported) {
+        return item.toString();
     }
 
     @Override
